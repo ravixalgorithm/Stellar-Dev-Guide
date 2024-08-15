@@ -4,21 +4,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/tutorial.css">
-  <title>Creating and Managing Offers</title>
+  <link rel="stylesheet" href="tutorial.css">
+  <title>Creating and Issuing Custom Assets</title>
 </head>
 
 <body>
   <header id="main-header">
     <nav id="navbar">
-      <h1><a href="/index.html"> &#x2190; Back to Home</a></h1>
+      <h1><a href="index.html"> &#x2190; Back to Home</a></h1>
       <ul>
         <li class="nav-link"><a href="#introduction">Introduction</a></li>
         <li class="nav-link"><a href="#prerequisites">Prerequisites</a></li>
         <li class="nav-link"><a href="#step1">Step 1: Set Up the Project</a></li>
         <li class="nav-link"><a href="#step2">Step 2: Load the Stellar SDK and Configure Accounts</a></li>
-        <li class="nav-link"><a href="#step3">Step 3: Build and Submit the Offer</a></li>
-        <li class="nav-link"><a href="#step5">Step 4: Run the Script</a></li>
+        <li class="nav-link"><a href="#step3">Step 3: Create the Trustline</a></li>
+        <li class="nav-link"><a href="#step4">Step 4: Issue the Asset</a></li>
+        <li class="nav-link"><a href="#step5">Step 5: Run the Script</a></li>
         <li class="nav-link"><a href="#Conclusion">Conclusion</a></li>
       </ul>
     </nav>
@@ -28,12 +29,12 @@
         <h1>Stellar Dev Guide</h1>
     </section>
     <section class="tutname">
-      <h1> Tutorial:- Creating and Managing Offers</h1>
+      <h1> Tutorial:- Creating and Issuing Custom Assets</h1>
     </section>
     <section class="main-section" id="introduction">
       <header>Introduction</header>
       <article class="main-article">
-        <p>Stellar allows you to create offers to buy or sell assets. This tutorial will guide you through creating and managing offers using the Stellar SDK for JavaScript.</p>
+        <p>Stellar allows you to create and issue your own custom assets. This is useful for creating tokens that represent real-world assets or other digital assets. In this tutorial, we'll walk through the process of creating and issuing a custom asset using the Stellar SDK for JavaScript.</p>
       </article>
     </section>
 
@@ -45,7 +46,7 @@
           <li>Node.js installed.</li>
           <li>A text editor or IDE (like VSCode).</li>
           <li>Basic knowledge of JavaScript.</li>
-          <li>A funded Stellar account with custom assets (refer to the first tutorial and asset creation tutorial).</li>
+          <li>Two Stellar accounts (one for issuing the asset and one for receiving it). You can create accounts and get testnet funds using the Stellar Laboratory.</li>
         </ul>
       </article>
     </section>
@@ -66,79 +67,116 @@
     <section class="main-section" id="step2">
       <header>Step 2: Load the Stellar SDK and Configure Accounts</header>
       <article class="main-article">
-        <p>Create a file named createOffer.js and add the following code:</p>
+        <p>Create a file named issueAsset.js and add the following code:</p>
         <code>
           const StellarSdk = require('stellar-sdk');<br>
           const server = new StellarSdk.Server('https://horizon-testnet.stellar.org');<br>
           <br>
-          // Seller's keys<br>
-          const sellerKeys = StellarSdk.Keypair.fromSecret('SELLER_SECRET_KEY');<br>
+          // Issuing account<br>
+          const issuingKeys = StellarSdk.Keypair.fromSecret('ISSUING_ACCOUNT_SECRET_KEY');<br>
           <br>
-          // Asset details<br>
-          const sellingAsset = new StellarSdk.Asset('MYTOKEN', sellerKeys.publicKey());<br>
-          const buyingAsset = StellarSdk.Asset.native(); // Buying XLM<br>
-          const amount = '100'; // Amount of MYTOKEN to sell<br>
-          const price = '0.5'; // Price of 1 MYTOKEN in XLM<br>
-
+          // Receiving account<br>
+          const receivingKeys = StellarSdk.Keypair.fromSecret('RECEIVING_ACCOUNT_SECRET_KEY');<br>
+          <br>
+          // Define the asset<br>
+          const customAsset = new StellarSdk.Asset('MYTOKEN', issuingKeys.publicKey());<br>
+          <br>
+          console.log('Issuing Public Key:', issuingKeys.publicKey());<br>
+          console.log('Receiving Public Key:', receivingKeys.publicKey());<br>
         </code>
-        <p>Replace SELLER_SECRET_KEY with the secret key of your seller account and adjust the asset details as needed.</p>
+        <p>Replace ISSUING_ACCOUNT_SECRET_KEY and RECEIVING_ACCOUNT_SECRET_KEY with the secret keys of your issuing and receiving accounts, respectively.</p>
       </article>
     </section>
 
     <section class="main-section" id="step3">
-      <header>Step 3: Build and Submit the Offer</header>
+      <header>Step 3: Create the Trustline</header>
       <article class="main-article">
-        <p>Add the following code to create and submit an offer:</p>
+        <p>The receiving account needs to trust the custom asset. We'll create a trustline to allow this.</p>
+        <p>Add the following code to create a trustline:</p>
         <code>
-          async function createOffer() { <br> &nbsp;
+          async function createTrustline() { <br> &nbsp;
+            try {<br>  &nbsp; &nbsp;
+              const account = await server.loadAccount(receivingKeys.publicKey());<br>  &nbsp; &nbsp;
+              <br>  &nbsp; &nbsp;
+              const transaction = new StellarSdk.TransactionBuilder(account, {<br> &nbsp; &nbsp; &nbsp;
+                fee: StellarSdk.BASE_FEE,<br> &nbsp; &nbsp; &nbsp;
+                networkPassphrase: StellarSdk.Networks.TESTNET,<br> &nbsp; &nbsp;
+              })<br> &nbsp; &nbsp;
+              .addOperation(StellarSdk.Operation.changeTrust({<br>  &nbsp; &nbsp; &nbsp;
+                asset: customAsset,<br>  &nbsp; &nbsp;
+              }))<br>  &nbsp; &nbsp;
+              .setTimeout(30)<br> &nbsp; &nbsp;
+              .build();<br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              transaction.sign(receivingKeys);<br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              const transactionResult = await server.submitTransaction(transaction);<br> &nbsp; &nbsp;
+              console.log('Trustline created successfully!', transactionResult);<br> &nbsp;
+            } <br> &nbsp;
+            catch (error) {<br> &nbsp; &nbsp;
+              console.error('Error creating trustline!', error);<br> &nbsp;
+            }<br>
+          }<br> &nbsp;
+          <br> 
+          createTrustline();<br> &nbsp;
+        </code>
+        <p>This script loads the receiving account, creates a trustline for the custom asset, and submits the transaction to the Stellar test network.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="step4">
+      <header>Step 4: Issue the Asset</header>
+      <article class="main-article">
+        <p>Now that the trustline is established, we can issue the asset from the issuing account to the receiving account.</p>
+        <p>Add the following code to issue the asset:</p>
+        <code> 
+          async function issueAsset() { <br> &nbsp; &nbsp;
             try { <br> &nbsp; &nbsp;
-              const account = await server.loadAccount(sellerKeys.publicKey()); <br> &nbsp; &nbsp;
+              const account = await server.loadAccount(issuingKeys.publicKey()); <br> &nbsp; &nbsp;
               <br> &nbsp; &nbsp;
               const transaction = new StellarSdk.TransactionBuilder(account, { <br> &nbsp; &nbsp; &nbsp;
                 fee: StellarSdk.BASE_FEE, <br> &nbsp; &nbsp; &nbsp;
                 networkPassphrase: StellarSdk.Networks.TESTNET, <br> &nbsp; &nbsp;
               }) <br> &nbsp; &nbsp;
-              <br> &nbsp; &nbsp;
-              .addOperation(StellarSdk.Operation.manageSellOffer({ <br> &nbsp; &nbsp; &nbsp;
-                selling: sellingAsset, <br> &nbsp; &nbsp; &nbsp;
-                buying: buyingAsset, <br> &nbsp; &nbsp; &nbsp;
-                amount: amount, <br> &nbsp; &nbsp; &nbsp;
-                price: price, <br> &nbsp; &nbsp;
+              .addOperation(StellarSdk.Operation.payment({ <br> &nbsp; &nbsp; &nbsp;
+                destination: receivingKeys.publicKey(), <br> &nbsp; &nbsp; &nbsp;
+                asset: customAsset, <br> &nbsp; &nbsp; &nbsp;
+                amount: '1000', // Amount of the custom asset to issue <br> &nbsp; &nbsp;
               })) <br> &nbsp; &nbsp;
               .setTimeout(30) <br> &nbsp; &nbsp;
               .build(); <br> &nbsp; &nbsp;
               <br> &nbsp; &nbsp;
-              transaction.sign(sellerKeys); <br> &nbsp; &nbsp;
+              transaction.sign(issuingKeys); <br> &nbsp; &nbsp;
               <br> &nbsp; &nbsp;
               const transactionResult = await server.submitTransaction(transaction); <br> &nbsp; &nbsp;
-              console.log('Offer created successfully!', transactionResult); <br> &nbsp;
+              console.log('Asset issued successfully!', transactionResult); <br> &nbsp;
             }  <br> &nbsp;
             catch (error) { <br> &nbsp; &nbsp;
-              console.error('Error!', error); <br> &nbsp;
+              console.error('Error issuing asset!', error); <br> &nbsp;
             } <br>
           } <br>
           <br>
-          createOffer(); <br>
+        issueAsset();
         </code>
-        <p>This script builds and submits an offer to sell MYTOKEN for XLM at a specified price.</p>
+        <p>This script loads the issuing account, builds a payment transaction to issue the custom asset, signs it, and submits it to the Stellar test network.</p>
       </article>
     </section>
 
-    <section class="main-section" id="step4">
-      <header>Step 4: Run the Script</header>
+    <section class="main-section" id="step5">
+      <header>Step 5: Run the Script</header>
       <article class="main-article">
         <p>Run the script using Node.js:</p>
         <code>
-          node createOffer.js
+          node issueAsset.js
         </code>
-        <p>If successful, you'll see a message indicating the offer was created successfully along with the transaction details.</p>
+        <p>If successful, you'll see messages indicating the trustline was created and the asset was issued, along with the transaction details.</p>
       </article>
     </section>
 
     <section class="main-section" id="Conclusion">
       <header>Conclusion</header>
       <article class="main-article">
-        <p>You've successfully created an offer on the Stellar network using the Stellar SDK for JavaScript. You can modify the script to manage existing offers, adjust prices, or create offers for different assets. For more details on offers, check out the Stellar Offers documentation.</p>
+        <p>You've successfully created and issued a custom asset on the Stellar network using the Stellar SDK for JavaScript. You can use this technique to create various types of tokens and distribute them to different accounts. For more advanced asset management options, check out the Stellar Assets documentation.</p>
       </article>
     </section>
 
