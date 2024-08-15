@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/CSS/tutorial.css">
+  <title>Setting Account Options and Flags</title>
+</head>
+
+<body>
+  <header id="main-header">
+    <nav id="navbar">
+      <h1><a href="/index.html"> &#x2190; Back to Home</a></h1>
+      <ul>
+        <li class="nav-link"><a href="#introduction">Introduction</a></li>
+        <li class="nav-link"><a href="#prerequisites">Prerequisites</a></li>
+        <li class="nav-link"><a href="#step1">Step 1: Set Up the Project</a></li>
+        <li class="nav-link"><a href="#step2">Step 2: Load the Stellar SDK and Configure Accounts</a></li>
+        <li class="nav-link"><a href="#step3">Step 3: Set Account Options</a></li>
+        <li class="nav-link"><a href="#step4">Step 4: Set Account Flags</a></li>
+        <li class="nav-link"><a href="#step5">Step 5: Run the Script</a></li>
+        <li class="nav-link"><a href="#Conclusion">Conclusion</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main id="main-doc">
+    <section class="logo">
+        <h1>Stellar Dev Guide</h1>
+    </section>
+    <section class="tutname">
+      <h1> Tutorial:- Setting Account Options and Flags</h1>
+    </section>
+    <section class="main-section" id="introduction">
+      <header>Introduction</header>
+      <article class="main-article">
+        <p>Stellar accounts have various options and flags that can be set to customize their behavior. This tutorial will guide you through setting account options and flags using the Stellar SDK for JavaScript.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="prerequisites">
+      <header>Prerequisites</header>
+      <article class="main-article">
+        <p>Ensure you have:</p>
+        <ul>
+          <li>Node.js installed.</li>
+          <li>A text editor or IDE (like VSCode).</li>
+          <li>Basic knowledge of JavaScript.</li>
+          <li>A funded Stellar account (refer to the first tutorial).</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="main-section" id="step1">
+      <header>Step 1: Set Up the Project</header>
+      <article class="main-article">
+        <p>First, create a new project directory and install the Stellar SDK:</p>
+        <code>
+          mkdir stellar-custom-asset <br>
+          cd stellar-custom-asset<br>
+          npm init -y<br>
+          npm install stellar-sdk<br>
+        </code>
+      </article>
+    </section>
+
+    <section class="main-section" id="step2">
+      <header>Step 2: Load the Stellar SDK and Configure Accounts</header>
+      <article class="main-article">
+        <p>Create a file named setOptions.js and add the following code:</p>
+        <code>
+          const StellarSdk = require('stellar-sdk'); <br>
+          const server = new StellarSdk.Server('https://horizon-testnet.stellar.org'); <br>
+          <br>
+          // Account keys <br>
+          const accountKeys = StellarSdk.Keypair.fromSecret('ACCOUNT_SECRET_KEY'); <br>
+          <br>
+          // Options to set <br>
+          const homeDomain = 'example.com'; <br>
+          const inflationDest = 'INFLATION_DEST_PUBLIC_KEY'; <br>
+        </code>
+        <p>Replace ACCOUNT_SECRET_KEY with the secret key of your account and INFLATION_DEST_PUBLIC_KEY with the public key of the inflation destination account.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="step3">
+      <header>Step 3: Set Account Options</header>
+      <article class="main-article">
+        <p>Add the following code to set account options:</p>
+        <code>
+          async function setAccountOptions() { <br> &nbsp;
+            try {<br> &nbsp; &nbsp;
+              const account = await server.loadAccount(accountKeys.publicKey());<br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              const transaction = new StellarSdk.TransactionBuilder(account, {<br> &nbsp; &nbsp; &nbsp;
+                fee: StellarSdk.BASE_FEE,<br> &nbsp; &nbsp; &nbsp;
+                networkPassphrase: StellarSdk.Networks.TESTNET,<br> &nbsp; &nbsp;
+              })<br> &nbsp; &nbsp;
+              .addOperation(StellarSdk.Operation.setOptions({<br> &nbsp; &nbsp; &nbsp;
+                homeDomain: homeDomain,<br> &nbsp; &nbsp; &nbsp;
+                inflationDest: inflationDest,<br> &nbsp; &nbsp;
+              }))<br> &nbsp; &nbsp;
+              .setTimeout(30)<br> &nbsp; &nbsp;
+              .build();<br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              transaction.sign(accountKeys);<br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              const transactionResult = await server.submitTransaction(transaction);<br> &nbsp; &nbsp;
+              console.log('Account options set successfully!', transactionResult);<br> &nbsp;
+            } <br> &nbsp;
+            catch (error) {<br> &nbsp; &nbsp;
+              console.error('Error!', error);<br> &nbsp;
+            }<br>
+          }<br> &nbsp;
+          <br>
+          setAccountOptions();<br> &nbsp;
+          
+        </code>
+        <p>This script sets the home domain and inflation destination for your account.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="step4">
+      <header>Step 4: Set Account Flags</header>
+      <article class="main-article">
+        <p>Add the following code to set account flags:</p>
+        <code>
+          async function setAccountFlags() { <br> &nbsp;
+            try { <br> &nbsp; &nbsp;
+              const account = await server.loadAccount(accountKeys.publicKey()); <br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              const transaction = new StellarSdk.TransactionBuilder(account, { <br> &nbsp; &nbsp; &nbsp;
+                fee: StellarSdk.BASE_FEE, <br> &nbsp; &nbsp; &nbsp;
+                networkPassphrase: StellarSdk.Networks.TESTNET, <br> &nbsp; &nbsp;
+              }) <br> &nbsp; &nbsp;
+              .addOperation(StellarSdk.Operation.setOptions({ <br> &nbsp; &nbsp; &nbsp;
+                setFlags: StellarSdk.AuthRequiredFlag | StellarSdk.AuthRevocableFlag, <br> &nbsp; &nbsp;
+              })) <br> &nbsp; &nbsp;
+              .setTimeout(30) <br> &nbsp; &nbsp;
+              .build(); <br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              transaction.sign(accountKeys); <br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              const transactionResult = await server.submitTransaction(transaction); <br> &nbsp; &nbsp;
+              console.log('Account flags set successfully!', transactionResult); <br> &nbsp;
+            } <br> &nbsp;
+            catch (error) { <br> &nbsp; &nbsp;
+              console.error('Error!', error); <br> &nbsp;
+            } <br>
+          } <br> &nbsp;
+          <br>
+          setAccountFlags();
+        </code>
+        <p>This script sets the AUTH_REQUIRED and AUTH_REVOCABLE flags for your account.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="step5">
+      <header>Step 5: Run the Script</header>
+      <article class="main-article">
+        <p>Run the script to set account options:</p>
+        <code>
+          node setOptions.js
+        </code>
+        <p>Run the script to set account flags:</p>
+        <code>
+          node setFlags.js
+        </code>
+        <p>If successful, you'll see messages indicating the account options and flags were set successfully, along with the transaction details.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="Conclusion">
+      <header>Conclusion</header>
+      <article class="main-article">
+        <p>You've successfully set account options and flags on the Stellar network using the Stellar SDK for JavaScript. You can use these techniques to customize your account behavior and manage your assets more effectively. For more details on account options and flags, check out the Stellar Set Options documentation.</p>
+      </article>
+    </section>
+
+    <footer class="footer">
+      <div class="footer__addr">
+        <h1 class="footer__logo">Steller Dev Guide</h1>
+            
+        <h2>Contact</h2>
+        
+        <address>
+          11aravipratapsingh@gmail.com<br>
+        </address>
+        <a class="footer__btn" href="https://github.com/ravixalgorithm/Stellar-Dev-Guide" target=”_blank” >Source Code</a>
+      </div>
+      
+      <ul class="footer__nav">
+        <li class="nav__item">
+          <h2 class="nav__title">Challenge</h2>
+    
+          <ul class="nav__ul">
+            <li>
+              <a href="https://dev.to/devteam/join-us-for-the-first-community-smart-contract-challenge-with-50000-in-prizes-41gl" target=”_blank”>Dev Challenge</a>
+            </li>
+    
+            <li>
+              <a href="https://github.com/ravixalgorithm" target=”_blank”>GitHub</a>
+            </li>
+                
+            <li>
+              <a href="https://dev.to/ravixalgorithm" target=”_blank”>DEV.to</a>
+            </li>
+          </ul>
+        </li>
+        
+        <li class="nav__item nav__item--extra">
+          <h2 class="nav__title">Tech Socials</h2>
+          
+          <ul class="nav__ul nav__ul--extra">
+            <li>
+              <a href="https://github.com/ravixalgorithm" target=”_blank”>GitHub</a>
+            </li>
+            
+            <li>
+              <a href="https://www.linkedin.com/in/ravixalgorithm/" target=”_blank”>LinkedIn</a>
+            </li>
+            <li>
+              <a href="https://linktr.ee/ravixalgorithm" target=”_blank”>linkTree</a>
+            </li>
+            <li>
+              <a href="https://app.daily.dev/ravixalgorithm" target=”_blank”>Daily.Dev</a>
+            </li>
+          </ul>
+        </li>
+        
+        <li class="nav__item">
+          <h2 class="nav__title">Social Media</h2>
+          
+          <ul class="nav__ul">
+            <li>
+              <a href="https://www.instagram.com/ravixalgorithm" target=”_blank”>Instagram</a>
+            </li>
+            
+            <li>
+              <a href="https://x.com/ravixalgorithm" target=”_blank”>X</a>
+            </li>
+            
+            <li>
+              <a href="https://www.youtube.com/@ravixalgorithm" target=”_blank”>YouTube</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      
+      <div class="legal">
+        <p>&copy; 2024 created for Dev Challenge</p>
+      </div>
+    </footer>
+  </main>
+</body>
+
+</html>

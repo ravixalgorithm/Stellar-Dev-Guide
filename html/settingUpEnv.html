@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/CSS/tutorial.css">
-  <title>Introduction to Stellar</title>
+  <title>Setting Up Your Development Environment</title>
 </head>
 
 <body>
@@ -13,10 +13,12 @@
     <nav id="navbar">
       <h1><a href="/index.html"> &#x2190; Back to Home</a></h1>
       <ul>
-        <li class="nav-link"><a href="#introduction">What is Stellar?</a></li>
-        <li class="nav-link"><a href="#keyfeatures">Key Features of Stellar</a></li>
-        <li class="nav-link"><a href="#usecases">Use Cases</a></li>
-        <li class="nav-link"><a href="#reference">Reference</a></li>
+        <li class="nav-link"><a href="#Prerequisites">Prerequisites</a></li>
+        <li class="nav-link"><a href="#step1">Step 1: Install Stellar SDK for JavaScript</a></li>
+        <li class="nav-link"><a href="#step2">Step 2: Obtain Test Network Credentials</a></li>
+        <li class="nav-link"><a href="#step3">Step 3: Start Coding</a></li>
+        <li class="nav-link"><a href="#step4">Step 4: Join the Community</a></li>
+        <li class="nav-link"><a href="#Conclusion">Conclusion</a></li>
       </ul>
     </nav>
   </header>
@@ -25,47 +27,72 @@
         <h1>Stellar Dev Guide</h1>
     </section>
     <section class="tutname">
-      <h1> Tutorial:- Introduction to Stellar</h1>
+      <h1> Tutorial:- Setting Up Your Development Environment</h1>
     </section>
-    <section class="main-section" id="introduction">
-      <header>What is Stellar?</header>
-      <article class="main-article">
-        <p>Stellar is an open-source, decentralized protocol for digital currency to fiat currency transfers which allows cross-border transactions between any currencies. It aims to facilitate fast, low-cost, and secure transactions.</p>
-      </article>
-    </section>
-
-    <section class="main-section" id="keyfeatures">
-      <header>Key Features of Stellar:</header>
+    <section class="main-section" id="Prerequisites">
+      <header>Prerequisites:</header>
       <article class="main-article">
         <ul>
-          <li><strong>Transactions:</strong> Stellar can handle thousands of transactions per second with a confirmation time of 3-5 seconds.</li>
-          <li><strong>Low Fees:</strong> Stellar's transaction fees are very low, making it cost-effective for users.</li>
-          <li><strong>Decentralized:</strong> Stellar operates on a decentralized network, ensuring security and reliability.</li>
-          <li><strong>Interoperability:</strong> Stellar supports a wide range of assets and currencies, facilitating seamless cross-border payments.</li>
+          <li><strong>Node.js: </strong>Install Node.js from nodejs.org if you haven't already.</li>
+          <li><strong>Text Editor: </strong>Choose a text editor or an Integrated Development Environment (IDE) like Visual Studio Code.</li>
         </ul>
       </article>
     </section>
 
-    <section class="main-section" id="usecases">
-      <header>Use Cases:</header>
+    <section class="main-section" id="step1">
+      <header>Step 1: Install Stellar SDK for JavaScript</header>
       <article class="main-article">
+        <p>Open your terminal and create a new directory for your project:</p>
+        <code>
+          mkdir stellar-development <br>
+          cd stellar-development
+        </code>
+        <p>Initialize a new Node.js project and install the Stellar SDK:</p>
+        <code>
+          npm init -y <br>
+          npm install stellar-sdk
+        </code>
+      </article>
+    </section>
+
+    <section class="main-section" id="step2">
+      <header>Step 2: Obtain Test Network Credentials</header>
+      <article class="main-article">
+        <p>Visit the <a href="https://laboratory.stellar.org/">Stellar Laboratory</a> to create two test accounts: one for development and one for testing transactions.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="step3">
+      <header>Step 3: Start Coding</header>
+      <article class="main-article">
+        <p>Start developing your Stellar application using the Stellar SDK and the documentation provided by Stellar.org:</p>
+        <code>
+          const StellarSdk = require('stellar-sdk'); <br>
+          const server = new StellarSdk.Server('https://horizon-testnet.stellar.org');
+        </code>
+      </article>
+    </section>
+
+    <section class="main-section" id="step4">
+      <header>Step 4: Join the Community</header>
+      <article class="main-article">
+        <p>Get involved with the Stellar community to stay updated with the latest developments, ask questions, and share your projects:</p>
         <ul>
-          <li><strong>Remittances:</strong>  Sending money across borders quickly and at low cost.</li>
-          <li><strong>Tokenization:</strong>  Creating digital representations of real-world assets.</li>
-          <li><strong>Micropayments:</strong> Facilitating small, frequent transactions economically.</li>
+          <li><a href="https://stellar.org/community/forum">Stellar Community Forum</a></li>
+          <li><a href="https://github.com/stellar">Stellar on GitHub</a></li>
+          <li><a href="https://www.reddit.com/r/stellar/">Stellar on Reddit</a></li>
+          <li><a href="https://x.com/stellarorg">Stellar on Twitter</a></li>
         </ul>
       </article>
     </section>
 
-    <section class="main-section" id="reference">
-      <header>Reference</header>
+    <section class="main-section" id="Conclusion">
+      <header>Conclusion</header>
       <article class="main-article">
-        <ul>
-          <li>All the documentation in this page is made with the help of OpenAI's ChatGPT
-        </ul>
+        <p>You're now ready to start developing on the Stellar network! These tutorials provide a solid foundation to begin exploring and building applications using Stellar's powerful features.</p>
       </article>
     </section>
-    
+
     <footer class="footer">
       <div class="footer__addr">
         <h1 class="footer__logo">Steller Dev Guide</h1>

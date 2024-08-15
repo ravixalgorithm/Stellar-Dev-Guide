@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/CSS/tutorial.css">
+  <title>Making Payments with Stellar</title>
+</head>
+
+<body>
+  <header id="main-header">
+    <nav id="navbar">
+      <h1><a href="/index.html"> &#x2190; Back to Home</a></h1>
+      <ul>
+        <li class="nav-link"><a href="#introduction">Introduction</a></li>
+        <li class="nav-link"><a href="#prerequisites">Prerequisites</a></li>
+        <li class="nav-link"><a href="#step1">Step 1: Set Up the Project</a></li>
+        <li class="nav-link"><a href="#step2">Step 2: Load the Stellar SDK and Configure Accounts</a></li>
+        <li class="nav-link"><a href="#step3">Step 3: Build and Sign the Transaction</a></li>
+        <li class="nav-link"><a href="#step4">Step 4: Run the Script</a></li>
+        <li class="nav-link"><a href="#Conclusion">Conclusion</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main id="main-doc">
+    <section class="logo">
+        <h1>Stellar Dev Guide</h1>
+    </section>
+    <section class="tutname">
+      <h1> Tutorial:- Making Payments with Stellar</h1>
+    </section>
+    <section class="main-section" id="introduction">
+      <header>Introduction</header>
+      <article class="main-article">
+        <p>Once you have a funded Stellar account, you can send payments to other accounts on the network. This tutorial will guide you through making a payment using the Stellar SDK for JavaScript.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="prerequisites">
+      <header>Prerequisites</header>
+      <article class="main-article">
+        <p>Ensure you have:</p>
+        <ul>
+          <li>Node.js installed.</li>
+          <li>A text editor or IDE (like VSCode).</li>
+          <li>Basic knowledge of JavaScript.</li>
+          <li>A funded Stellar account (refer to the previous tutorial).</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="main-section" id="step1">
+      <header>Step 1: Set Up the Project</header>
+      <article class="main-article">
+        <p>First, create a new project directory and install the Stellar SDK:</p>
+        <code>
+          mkdir stellar-custom-asset <br>
+          cd stellar-custom-asset<br>
+          npm init -y<br>
+          npm install stellar-sdk<br>
+        </code>
+      </article>
+    </section>
+
+    <section class="main-section" id="step2">
+      <header>Step 2: Load the Stellar SDK and Configure Accounts</header>
+      <article class="main-article">
+        <p>Create a file named sendPayment.js and add the following code:</p>
+        <code>
+          const StellarSdk = require('stellar-sdk'); <br>
+          const server = new StellarSdk.Server('https://horizon-testnet.stellar.org'); <br>
+          <br>
+          // Sender's keys <br>
+          const senderKeys = StellarSdk.Keypair.fromSecret('SENDER_SECRET_KEY'); <br>
+          <br>
+          // Receiver's public key <br>
+          const receiverPublicKey = 'RECEIVER_PUBLIC_KEY'; <br>
+          <br>
+          // Transaction details <br>
+          const amount = '10'; // Amount of XLM to send <br>
+
+        </code>
+        <p>Replace SENDER_SECRET_KEY with the secret key of your sender account and RECEIVER_PUBLIC_KEY with the public key of your receiver account.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="step3">
+      <header>Step 3: Build and Sign the Transaction</header>
+      <article class="main-article">
+        <p>Add the following code to build and sign the transaction:</p>
+        <code>
+          async function sendPayment() { <br> &nbsp;
+            try { <br> &nbsp; &nbsp;
+              const account = await server.loadAccount(senderKeys.publicKey()); <br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              const transaction = new StellarSdk.TransactionBuilder(account, { <br> &nbsp; &nbsp; &nbsp;
+                fee: StellarSdk.BASE_FEE, <br> &nbsp; &nbsp; &nbsp;
+                networkPassphrase: StellarSdk.Networks.TESTNET, <br> &nbsp; &nbsp;
+              }) <br> &nbsp; &nbsp;
+              .addOperation(StellarSdk.Operation.payment({ <br> &nbsp; &nbsp; &nbsp;
+                destination: receiverPublicKey, <br> &nbsp; &nbsp; &nbsp;
+                asset: StellarSdk.Asset.native(), <br> &nbsp; &nbsp; &nbsp;
+                amount: amount, <br> &nbsp; &nbsp;
+              })) <br> &nbsp; &nbsp;
+              .setTimeout(30) <br> &nbsp; &nbsp;
+              .build(); <br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              transaction.sign(senderKeys); <br> &nbsp; &nbsp;
+              <br> &nbsp; &nbsp;
+              const transactionResult = await server.submitTransaction(transaction); <br> &nbsp; &nbsp;
+              console.log('Payment successful!', transactionResult); <br> &nbsp;
+            }  <br> &nbsp;
+            catch (error) { <br> &nbsp; &nbsp;
+              console.error('Error!', error); <br> &nbsp;
+            } <br>
+          } <br>
+          <br>
+          sendPayment();
+          
+        </code>
+        <p>This script loads the sender's account, builds a payment transaction, signs it, and submits it to the Stellar test network.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="step4">
+      <header>Step 4: Run the Script</header>
+      <article class="main-article">
+        <p>Run the script using Node.js:</p>
+        <code>
+          node sendPayment.js
+        </code>
+        <p>If successful, you'll see a message indicating the payment was successful along with the transaction details.</p>
+      </article>
+    </section>
+
+    <section class="main-section" id="Conclusion">
+      <header>Conclusion</header>
+      <article class="main-article">
+        <p>You've successfully sent a payment on the Stellar network using the Stellar SDK for JavaScript. You can adjust the script to send different amounts, use different assets, or interact with other accounts. For more advanced payment options, check out the Stellar Payment Operations documentation.</p>
+      </article>
+    </section>
+
+    <footer class="footer">
+      <div class="footer__addr">
+        <h1 class="footer__logo">Steller Dev Guide</h1>
+            
+        <h2>Contact</h2>
+        
+        <address>
+          11aravipratapsingh@gmail.com<br>
+        </address>
+        <a class="footer__btn" href="https://github.com/ravixalgorithm/Stellar-Dev-Guide" target=”_blank” >Source Code</a>
+      </div>
+      
+      <ul class="footer__nav">
+        <li class="nav__item">
+          <h2 class="nav__title">Challenge</h2>
+    
+          <ul class="nav__ul">
+            <li>
+              <a href="https://dev.to/devteam/join-us-for-the-first-community-smart-contract-challenge-with-50000-in-prizes-41gl" target=”_blank”>Dev Challenge</a>
+            </li>
+    
+            <li>
+              <a href="https://github.com/ravixalgorithm" target=”_blank”>GitHub</a>
+            </li>
+                
+            <li>
+              <a href="https://dev.to/ravixalgorithm" target=”_blank”>DEV.to</a>
+            </li>
+          </ul>
+        </li>
+        
+        <li class="nav__item nav__item--extra">
+          <h2 class="nav__title">Tech Socials</h2>
+          
+          <ul class="nav__ul nav__ul--extra">
+            <li>
+              <a href="https://github.com/ravixalgorithm" target=”_blank”>GitHub</a>
+            </li>
+            
+            <li>
+              <a href="https://www.linkedin.com/in/ravixalgorithm/" target=”_blank”>LinkedIn</a>
+            </li>
+            <li>
+              <a href="https://linktr.ee/ravixalgorithm" target=”_blank”>linkTree</a>
+            </li>
+            <li>
+              <a href="https://app.daily.dev/ravixalgorithm" target=”_blank”>Daily.Dev</a>
+            </li>
+          </ul>
+        </li>
+        
+        <li class="nav__item">
+          <h2 class="nav__title">Social Media</h2>
+          
+          <ul class="nav__ul">
+            <li>
+              <a href="https://www.instagram.com/ravixalgorithm" target=”_blank”>Instagram</a>
+            </li>
+            
+            <li>
+              <a href="https://x.com/ravixalgorithm" target=”_blank”>X</a>
+            </li>
+            
+            <li>
+              <a href="https://www.youtube.com/@ravixalgorithm" target=”_blank”>YouTube</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      
+      <div class="legal">
+        <p>&copy; 2024 created for Dev Challenge</p>
+      </div>
+    </footer>
+  </main>
+</body>
+
+</html>
