@@ -162,6 +162,7 @@ html,body {
     position: relative;
     margin-left: 0px;
     margin-top: 379px;
+    max-width: 100%;
   }
 
 }
